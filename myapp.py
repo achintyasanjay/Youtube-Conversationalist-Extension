@@ -47,6 +47,7 @@
 import streamlit as st
 import yt_dlp
 import imageio_ffmpeg as iof
+from vectorizeAudio import vectorize_audio
 
 def download_audio(video_url):
     ydl_opts = {
@@ -76,6 +77,9 @@ def main():
                 video_title = download_audio(video_url)
                 if video_title:
                     st.success(f'Audio downloaded successfully: {video_title}.mp3')
+
+                    # save audio file in vector db
+                    vectorize_audio(video_title, f"./downloads/{video_title}.mp3")
                 else:
                     st.error('Failed to download audio. Check the video URL.')
             except Exception as e:
