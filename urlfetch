@@ -1,0 +1,50 @@
+// // background.js
+// chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+//     if (message.action === "fetchUrl") {
+//       chrome.storage.local.set({videoUrl: message.url});
+//     }
+//   });
+  
+// // contentScript.js
+// chrome.runtime.sendMessage({
+//     action: "fetchUrl",
+//     url: window.location.href
+//   });
+  
+
+// // popup.js
+// document.addEventListener('DOMContentLoaded', () => {
+//     chrome.storage.local.get('videoUrl', (data) => {
+//       if (data.videoUrl) {
+//         const frame = document.getElementById('streamlitFrame');
+//         frame.src = `http://localhost:8501?video_url=${encodeURIComponent(data.videoUrl)}`;
+//       }
+//     });
+//   });
+  
+// //manifest.json
+//   {
+//     "manifest_version": 3,
+//     "name": "test2",
+//     "version": "1.0",
+//     "permissions": [
+//         "activeTab",
+//         "storage",
+//         "tabs"
+//     ],
+//     "host_permissions": [
+//         "*://*.youtube.com/*"
+//       ],
+//     "background": {
+//         "service_worker": "background.js"
+//       },
+//     "action": {
+//         "default_popup": "popup.html"
+//     },
+//     "content_scripts": [
+//         {
+//           "matches": ["*://*.youtube.com/watch*"],
+//           "js": ["contentScript.js"]
+//         }
+//       ]
+//   }
