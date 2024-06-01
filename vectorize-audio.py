@@ -15,15 +15,59 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain import hub
+import together
+import pymongo
+from typing import List
 
 load_dotenv()
 DG_API_KEY = os.getenv("DG_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+together.api_key = TOGETHER_API_KEY
+MONGO_DB_URI = os.getenv("MONGO_DB_URI")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME")
 
 AUDIO_FILE = "./testing-audio/ice-cream.m4a"
+TITLE = "test youtube video title"
+
+EMBEDDING = "meta-llama/Llama-2-70b-chat-hf"
+
+def generate_embeddings(input_texts: List[str], model_api_string: str) -> List[List[float]]:
+    """Generate embeddings from Together python library.
+
+    Args:
+        input_texts: a list of string input texts.
+        model_api_string: str. An API string for a specific embedding model of your choice.
+
+    Returns:
+        embeddings_list: a list of embeddings. Each element corresponds to the each input text.
+    """
+    together_client = together.Together()
+    outputs = together_client.embeddings.create(
+        input=input_texts,
+        model=model_api_string,
+    )
+    return [x.embedding for x in outputs.data]
+
+def store_embeddings(video_title: str, embedding: List[float]):
+    """Store the input text and its corresponding embedding into MongoDB."""
+    # Connect to MongoDB
+    mongo = pymongo.MongoClient(MONGO_DB_URI)
+    db = mongo.MONGO_DB_NAME
+    collection = db.MONGO_COLLECTION_NAME
+    
+    document = {
+        "text": video_title,
+        "embedding": embedding
+    }
+    
+    collection.insert_one(document)
 
 try:
     deepgram = DeepgramClient(DG_API_KEY)
+
+    # transcribing the audio
 
     options = PrerecordedOptions(
         model="nova-2",
@@ -38,44 +82,10 @@ try:
     }
 
     response = deepgram.listen.prerecorded.v("1").transcribe_file(payload, options)
-    print(response.to_json(indent=4))
+
+    # Vectorizing the transcription
+    output = generate_embeddings([response], EMBEDDING)
+    print(f"Embedding size is: {str(len(output[0]))}")
 
 except Exception as e:
     print(f"Exception: {e}")
-
-# with open('dataset.txt', 'w') as f:
-#     f.write(response['results'].channels[0].alternatives[0].transcript)
-
-
-# model_name = "BAAI/bge-small-en"
-# model_kwargs = {"device": "cpu"}
-# encode_kwargs = {"normalize_embeddings": True}
-# hf = HuggingFaceBgeEmbeddings(
-#     model_name=model_name, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
-# )
-
-# # Load the document, split it into chunks, embed each chunk and load it into the vector store.
-# raw_documents = TextLoader('dataset.txt').load()
-# text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-# documents = text_splitter.split_documents(raw_documents)
-# db = FAISS.from_documents(documents, hf)
-# retriever = db.as_retriever()
-
-# # Query the vector store with a query document
-# query = "tell me about your second love story"
-# docs = db.similarity_search(query)
-# print(docs[0].page_content)
-
-# llm = ChatGroq(temperature=0, model_name="llama3-70b-8192")
-# prompt = hub.pull("rlm/rag-prompt")
-# def format_docs(docs):
-#     return "\n\n".join(doc.page_content for doc in docs)
-
-# rag_chain = (
-#     {"context": retriever | format_docs, "question": RunnablePassthrough()}
-#     | prompt
-#     | llm
-#     | StrOutputParser()
-# )
-
-# print(rag_chain.invoke(query))
