@@ -1,4 +1,12 @@
 streamlit==1.24.1
-openai==0.27.8
+openai==1.26.0
 pandas==2.0.3
 youtube-transcript-api==0.6.2
+langchain-cli==0.0.24
+langchain==0.2.1
+langchain-mongodb==0.1.5
+langchain-openai==0.1.8
+pymongo==4.7.2
+pypdf==4.2.0
+jupyter==1.0.0
+langchain-community==0.2.1
