@@ -2,32 +2,17 @@ import streamlit as st
 from pymongo import MongoClient
 import openai
 
+
 # Initialize OpenAI
 openai_api_key = st.secrets["openai_api_key"]
 openai.api_key = openai_api_key
 
 # MongoDB setup
-connection_string = "mongodb+srv://mukulm2010:h1VLOWHWMUMS5RYT@cluster0.7ruqy85.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-try:
-    # Connect to MongoDB
-    mongo_client = MongoClient(connection_string)
-    # Access the specific database
-    db = mongo_client['langchain_chatbot']
-    # Example operation: list collections
-    print(db.list_collection_names())
-except Exception as e:
-    print(f"An error occurred while connecting to MongoDB: {e}")# Function definitions
-def get_related_documents(query):
-    try:
-        # MongoDB setup
-        mongo_client = MongoClient("your_mongodb_connection_string", serverSelectionTimeoutMS=5000)
-        db = mongo_client.your_database_name
-        transcripts_collection = db.transcripts
-        documents = transcripts_collection.find({"$text": {"$search": query}})
-        return [doc['transcript'] for doc in documents]
-    except Exception as e:
-        print(f"Database connection failed: {e}")
-        return []  # Return an empty list if MongoDB fails
+connection_string = "mongodb+srv://mukulm2010:h1VLOWHWMUMS5RYT@cluster1.xvdw8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1"
+mongo_client = MongoClient(connection_string)
+db = mongo_client['langchain_chatbot']
+transcripts_collection = db.data
+
 
 def query_openai(question, documents):
     if documents:
@@ -45,10 +30,33 @@ def query_openai(question, documents):
     )
     return response['choices'][0]['message']['content']
 
-# Initialize session state for conversation
-if 'conversation' not in st.session_state:
-    st.session_state.conversation = []
 
+# Function to get related documents from MongoDB
+def get_related_documents(query):
+    try:
+        # Ensure a text index exists on the 'transcript' field, or MongoDB won't be able to execute a text search.
+        print(query)
+        documents = transcripts_collection.find({"$text": {"$search": query}})
+        return [doc['data'] for doc in documents]
+    except Exception as e:
+        st.error(f"Database connection failed: {e}")
+        return []
+
+# Function to handle summary generation
+def generate_summary(transcript):
+    response = openai.ChatCompletion.create(
+        model="gpt-4-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": transcript}
+        ],
+        max_tokens=1500
+    )
+    # Properly access the 'content' of the response
+    return response['choices'][0]['message']['content']
+
+# Function to query OpenAI with chat
+# Function to handle chat queries and update the conversation
 def handle_query():
     user_query = st.session_state.user_query
     if user_query:  # Check if there is a query
@@ -60,12 +68,31 @@ def handle_query():
         # Clear the input after processing
         st.session_state.user_query = ""
 
-st.title('RAG Chatbot')
+# Initialize session state for conversation
+if 'conversation' not in st.session_state:
+    st.session_state.conversation = []
+# Main application layout
+def main():
+    st.title("YouTube Video Processor and Chatbot")
 
-# Input field with on_change callback
-user_query = st.text_input("Ask a question:", key="user_query",
-                           on_change=handle_query, args=())
+    # Assume transcript is automatically updated from an external source
+    transcript = "Your automatically fetched transcript goes here."
 
-# Display the conversation history
-for message in st.session_state.conversation:
-    st.text(message)
+    # Create tabs
+    tab1, tab2 = st.tabs(["Summary", "Chat"])
+
+    with tab1:
+        st.header("Video Summary")
+        summary = generate_summary(transcript)
+        st.write(summary)
+
+    with tab2:
+        st.header("Chat with RAG")
+        # Input field with on_change callback for chat
+        st.text_input("Ask a question:", key="user_query", on_change=handle_query)
+        # Display the conversation history
+        for message in st.session_state.conversation:
+            st.text(message)
+
+if __name__ == "__main__":
+    main()
