@@ -1,9 +1,9 @@
-# GenAIHackathonLLMApp
+# GenAIHackathonLLMApp: Youtube Conversationalist
 
 # Summary
-YouTube conversationalist Google Chrome extension for YouTube videos that produces summaries and a chat discussing the video.
+YouTube Conversationalist Google Chrome extension for YouTube videos that produces summaries and a chat discussing the video.
 
-The aim is to aim at efficient video content consumption by providing concise summaries and key point highlights. This application is particularly useful for users who need to quickly grasp the essence of lengthy videos without watching them in their entirety.
+The aim is to optimize video content consumption by providing concise summaries and key point highlights. This application is particularly useful for users who need to quickly grasp the essence of lengthy videos without watching them in their entirety.
 
 
 ![image](https://github.com/asanjay123/GenAIHackathonLLMApp/assets/90867690/baad2ba2-8b29-48e7-b41e-d9793892907a)
