@@ -60,6 +60,27 @@ def store_embeddings(video_title: str, embedding: List[float]):
     except Exception as e:
         print(f"Exception: {e}")
 
+def store_text(video_title: str, text: str):
+    """Store the input text and its corresponding embedding into MongoDB.
+
+    Args:
+        video_title: str. the youtube video title.
+        embedding: List[float]. list of embeddings.
+    """
+    try:
+        mongo = pymongo.MongoClient(MONGO_DB_URI)
+        db = mongo[MONGO_DB_NAME]
+        collection = db[MONGO_COLLECTION_NAME]
+
+        document = {
+            "title": video_title,
+            "raw_text": text
+        }
+        
+        collection.insert_one(document)
+    except Exception as e:
+        print(f"Exception: {e}")
+
 def vectorize_audio(video_title: str, audio_file):
     """vectorize an audio file into mongodb atlas.
 
@@ -89,8 +110,29 @@ def vectorize_audio(video_title: str, audio_file):
         response = deepgram.listen.prerecorded.v("1").transcribe_file(payload, options)
 
         # Vectorizing the transcription
-        embeddings = generate_embeddings([response["results"]["channels"][0]["alternatives"][0]["transcript"]], MODEL)
-        store_embeddings(video_title, embeddings[0])
+        # embeddings = generate_embeddings([response["results"]["channels"][0]["alternatives"][0]["transcript"]], MODEL)
+        # store_embeddings(video_title, embeddings[0])
+        store_text(video_title, response["results"]["channels"][0]["alternatives"][0]["transcript"])
 
     except Exception as e:
         print(f"Exception: {e}")
+
+def get_transcript(video_title: str, audio_file):
+    deepgram = DeepgramClient(DG_API_KEY)
+
+    options = PrerecordedOptions(
+        model="nova-2",
+        smart_format=True,
+    )
+
+    with open(audio_file, "rb") as file:
+        buffer_data = file.read()
+
+    payload: FileSource = {
+        "buffer": buffer_data,
+    }
+
+    # transcribing the audio
+    response = deepgram.listen.prerecorded.v("1").transcribe_file(payload, options)
+
+    return response["results"]["channels"][0]["alternatives"][0]["transcript"]
