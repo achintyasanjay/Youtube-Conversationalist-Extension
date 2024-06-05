@@ -8,3 +8,5 @@ youtube-transcript-api==0.6.2
 openpyxl==3.0.5
 yt-dlp
 imageio-ffmpeg
+python-dotenv
+deepgram-sdk==3.2.7

@@ -50,16 +50,24 @@ import yt_dlp
 import imageio_ffmpeg as iof
 from vectorizeAudio import vectorize_audio, get_transcript
 import openai
+from dotenv import load_dotenv
+import pymongo
+
+load_dotenv(override=True)
 
 # # Initialize OpenAI
-openai_api_key = os.getenv("openai_api_key")
-openai.api_key = openai_api_key
+# openai_api_key = os.getenv("openai_api_key")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
 
-# # MongoDB setup
-# connection_string = "mongodb+srv://mukulm2010:h1VLOWHWMUMS5RYT@cluster1.xvdw8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1"
-# mongo_client = MongoClient(connection_string)
-# db = mongo_client['langchain_chatbot']
-# transcripts_collection = db.data
+# MongoDB setup
+MONGO_DB_URI = os.getenv("MONGO_DB_URI")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME")
+
+mongo = pymongo.MongoClient(MONGO_DB_URI)
+db = mongo[MONGO_DB_NAME]
+collection = db[MONGO_COLLECTION_NAME]
 
 video_title = None
 transcript = None
@@ -72,7 +80,8 @@ def download_audio(video_url):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'ffmpeg_location': iof.get_ffmpeg_exe(),
+        # 'ffmpeg_location': iof.get_ffmpeg_exe(),
+        'ffmpeg_location': "/opt/homebrew/bin/ffmpeg",
         'outtmpl': 'downloads/%(title)s.%(ext)s',  # Directory and filename template
     }
 
@@ -131,6 +140,9 @@ def generate_summary(transcript):
 def main():
     st.title('YouTube Conversationalist')
 
+    video_title = None
+    transcript = None
+
     video_url = st.text_input('Enter YouTube Video URL:', '')
 
     if st.button('Pass Youtube URL'):
@@ -150,15 +162,17 @@ def main():
         else:
             st.error('Please enter a valid YouTube video URL.')
     
-    transcript = get_transcript(video_title, f"./downloads/{video_title}.mp3")
-    print(transcript)
+    if video_title:
+        transcript = get_transcript(video_title, f"./downloads/{video_title}.mp3")
+        print(transcript)
 
     tab1, tab2 = st.tabs(["Summary", "Chat"])
 
     with tab1:
         st.header("Video Summary")
-        summary = generate_summary(transcript)
-        st.write(summary)
+        if transcript:
+            summary = generate_summary(transcript)
+            st.write(summary)
 
     with tab2:
         st.header("Chat with RAG")

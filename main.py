@@ -1,10 +1,14 @@
 import streamlit as st
 from pymongo import MongoClient
 import openai
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 # Initialize OpenAI
-openai_api_key = st.secrets["openai_api_key"]
+# openai_api_key = st.secrets["openai_api_key"]
+openai_api_key = os.getenv("OPENAI_API_KEY")
 openai.api_key = openai_api_key
 
 # MongoDB setup

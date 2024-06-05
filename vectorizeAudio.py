@@ -9,9 +9,9 @@ import together
 import pymongo
 from typing import List
 
-load_dotenv()
+load_dotenv(override=True)
+
 DG_API_KEY = os.getenv("DG_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 together.api_key = TOGETHER_API_KEY
 MONGO_DB_URI = os.getenv("MONGO_DB_URI")
@@ -110,9 +110,9 @@ def vectorize_audio(video_title: str, audio_file):
         response = deepgram.listen.prerecorded.v("1").transcribe_file(payload, options)
 
         # Vectorizing the transcription
-        # embeddings = generate_embeddings([response["results"]["channels"][0]["alternatives"][0]["transcript"]], MODEL)
-        # store_embeddings(video_title, embeddings[0])
-        store_text(video_title, response["results"]["channels"][0]["alternatives"][0]["transcript"])
+        embeddings = generate_embeddings([response["results"]["channels"][0]["alternatives"][0]["transcript"]], MODEL)
+        store_embeddings(video_title, embeddings[0])
+        # store_text(video_title, response["results"]["channels"][0]["alternatives"][0]["transcript"])
 
     except Exception as e:
         print(f"Exception: {e}")
