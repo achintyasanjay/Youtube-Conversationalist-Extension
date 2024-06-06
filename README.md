@@ -8,6 +8,21 @@ The aim is to optimize video content consumption by providing concise summaries 
 
 ![image](https://github.com/asanjay123/GenAIHackathonLLMApp/assets/90867690/baad2ba2-8b29-48e7-b41e-d9793892907a)
 
+Source Video used for below demos:
+<a href="https://www.youtube.com/watch?v=VJgdOMXhEj0">Formula 1 Cars
+
+Multiple Summary Versions
+<img width="575" alt="Screenshot 2024-06-05 at 9 13 05 PM" src="https://github.com/asanjay123/GenAIHackathonLLMApp/assets/37911144/ff8ba884-dd8f-4c30-a859-b0a840853a42">
+
+<img width="575" alt="Screenshot 2024-06-05 at 9 13 13 PM" src="https://github.com/asanjay123/GenAIHackathonLLMApp/assets/37911144/f09bfe51-7fe1-4cc4-a13a-27faa5e61fc6">
+
+Chat Bot Feature
+
+<img width="666" alt="Screenshot 2024-06-05 at 9 13 26 PM" src="https://github.com/asanjay123/GenAIHackathonLLMApp/assets/37911144/cc12c1de-667d-4c44-a27a-1a20f589c5d3">
+
+
+
+
 
 ### Features:
 - **Video Summarization:** Automatically summarizes videos and highlights the key points discussed, allowing users to quickly understand the main content without viewing the entire video.
