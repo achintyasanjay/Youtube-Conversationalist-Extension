@@ -12,7 +12,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 openai.api_key = openai_api_key
 
 # MongoDB setup
-connection_string = "mongodb+srv://mukulm2010:h1VLOWHWMUMS5RYT@cluster1.xvdw8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1"
+connection_string = "enter api string here"
 mongo_client = MongoClient(connection_string)
 db = mongo_client['langchain_chatbot']
 transcripts_collection = db.data

@@ -16,9 +16,6 @@ from langchain.prompts import PromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
-# from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-# from langchain_community.vectorstores import FAISS
-# from langchain_groq import ChatGroq
 
 load_dotenv(override=True)
 
@@ -44,10 +41,6 @@ def create_chunks():
     if not st.session_state.transcript:
             return []
     
-    # Using CharacterTextSplitter for using transcript directly
-    # text_splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=20)
-    # docs = text_splitter.split_text(transcript)
-
     # Split text into documents using RecursiveCharacterTextSplitter
     doc = Document(page_content=st.session_state.transcript)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)

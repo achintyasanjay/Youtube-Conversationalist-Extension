@@ -1,7 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 
-api_key = "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"
+api_key = "enter key here"
 
 chat = ChatGroq(temperature=0, model_name="llama3-70b-8192", groq_api_key=api_key)
 
